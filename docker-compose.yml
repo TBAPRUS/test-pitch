@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  nginx:
+    image: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/scripts:/src
+    environment:
+      NGINX_PORT: 80
+      NGINX_ROOT: /var/www/pitch
+      NGINX_LOGS: /var/log/nginx
+      PHP_SCRIPT_FILENAME: /var/www/pitch/index.php
+    command: ./src/run_nginx.sh
+    networks:
+      - php-network
+  php:
+    build: ./php
+    restart: always
+    volumes:
+      - ./php:/var/www/pitch
+    networks:
+      - php-network
+
+networks:
+  php-network:
+    driver: bridge
